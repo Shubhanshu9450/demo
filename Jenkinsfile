@@ -4,14 +4,27 @@ pipeline {
   stages {
     stage('Verify Java/Gradle') {
       steps {
-        sh 'java -version'
-        sh './gradlew --version'
+        script {
+          if (isUnix()) {
+            sh 'java -version'
+            sh './gradlew --version'
+          } else {
+            bat 'java -version'
+            bat 'gradlew.bat --version'
+          }
+        }
       }
     }
 
     stage('Build & Test') {
       steps {
-        sh './gradlew clean build --no-daemon'
+        script {
+          if (isUnix()) {
+            sh './gradlew clean build --no-daemon'
+          } else {
+            bat 'gradlew.bat clean build --no-daemon'
+          }
+        }
       }
     }
 
@@ -29,7 +42,11 @@ pipeline {
   }
 
   post {
-    success { echo 'Build succeeded' }
-    failure { echo 'Build failed' }
+    success {
+      echo 'Build succeeded'
+    }
+    failure {
+      echo 'Build failed'
+    }
   }
 }
